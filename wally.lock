@@ -15,12 +15,7 @@ dependencies = []
 [[package]]
 name = "kongb/chess"
 version = "0.1.0"
-dependencies = [["knit", "sleitnick/knit@1.4.7"], ["maid", "flamenco687/maid@3.2.2"], ["signal", "sleitnick/signal@1.4.1"], ["testez", "roblox/testez@0.4.1"]]
-
-[[package]]
-name = "roblox/testez"
-version = "0.4.1"
-dependencies = []
+dependencies = [["knit", "sleitnick/knit@1.4.7"], ["maid", "flamenco687/maid@3.2.2"], ["signal", "sleitnick/signal@1.4.1"]]
 
 [[package]]
 name = "sleitnick/comm"
