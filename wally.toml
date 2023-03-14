@@ -1,0 +1,11 @@
+[package]
+name = "kongb/chess"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
+knit = "sleitnick/knit@1.4.7"
+testez = "roblox/testez@0.4.1"
+maid = "flamenco687/maid@3.2.2"
+signal = "sleitnick/signal@1.4.0"	
