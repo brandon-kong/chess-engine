@@ -49,7 +49,7 @@ function Draggable:Connect()
             self.dragging = false
             self.UI.Position = self.startPos
             self.dragStopped:Fire()
-            print('hi')
+            self.UI.ZIndex = 2
         end
     end))
 

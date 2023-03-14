@@ -24,6 +24,12 @@ return {
 
     colors = {
         light = Color3.fromRGB(255, 215, 53),
-        dark = Color3.fromRGB(179, 150, 36)
+        dark = Color3.fromRGB(179, 150, 36),
+
+        valid_light = Color3.fromRGB(49, 223, 72),
+        valid_dark = Color3.fromRGB(35, 155, 51),
+
+        take_light = Color3.fromRGB(255, 0, 0),
+        take_dark = Color3.fromRGB(179, 0, 0),
     },
 }

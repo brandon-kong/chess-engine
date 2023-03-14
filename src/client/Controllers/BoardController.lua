@@ -32,9 +32,11 @@ function BoardController:KnitStart()
     local newGame = ChessEngine.new()
     local BoardUI  = Knit.Player.PlayerGui.Game.Background.Board
     local chessDriver = ChessDriver.new(BoardUI, newGame)
-    chessDriver:drawBoard()
-    chessDriver:drawPieces()
+    chessDriver:draw()
 
+    BoardUI.Parent.Undo.MouseButton1Click:Connect(function()
+        chessDriver:UndoMove()
+    end)
 end
 
 return BoardController
