@@ -2,6 +2,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.knit)
 
 local Board = require(script.Parent.Parent.Components.Board)
+local ChessEngine = require(script.Parent.Parent.Modules.ChessEngine)
+local ChessDriver = require(script.Parent.Parent.Modules.ChessEngine.ChessDriver)
 
 local BoardController = Knit.CreateController {
     Name = "BoardController";
@@ -16,7 +18,7 @@ end
 function BoardController:KnitStart()
     print("BoardController Started")
 
-    local BoardUI  = Knit.Player.PlayerGui.Game.Background
+    --[[local BoardUI  = Knit.Player.PlayerGui.Game.Background
     local newBoard = Board.new(BoardUI.Board)
     newBoard:Initialize()
     
@@ -25,7 +27,14 @@ function BoardController:KnitStart()
     BoardUI.Reset.MouseButton1Click:Connect(function()
         newBoard:Reset()
         newBoard:Mount()
-    end)
+    end)]]
+
+    local newGame = ChessEngine.new()
+    local BoardUI  = Knit.Player.PlayerGui.Game.Background.Board
+    local chessDriver = ChessDriver.new(BoardUI, newGame)
+    chessDriver:drawBoard()
+    chessDriver:drawPieces()
+
 end
 
 return BoardController

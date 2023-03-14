@@ -7,7 +7,7 @@ local Signal = require(Packages.signal)
 local Draggable = {}
 Draggable.__index = Draggable
 
-function Draggable.new(UI, board)
+function Draggable.new(UI)
     local self = setmetatable({}, Draggable)
 
     self.UI = UI
@@ -16,7 +16,6 @@ function Draggable.new(UI, board)
     self.dragStart = nil
     self.startPos = UI.Position
     self._Maid = Maid.new()
-    self.board = board
 
     self.dragStarted = Signal.new()
     self.dragStopped = Signal.new()
@@ -37,21 +36,20 @@ function Draggable:Connect()
     end))
 
     self._Maid:GiveTask(self.UI.InputBegan:Connect(function(input)
-        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and self.board.selectedPieceOnBoard == nil then
+        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
             self.dragging = true
             self.dragStarted:Fire()
             self.dragStart = input.Position
-            self.startPos = self.UI.Position
             self.UI.ZIndex = 3
-            
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    self.UI.Position = self.startPos
-                    self.UI.ZIndex = 2
-                    self.dragging = false
-                    self.dragStopped:Fire()
-                end
-            end)
+        end
+    end))
+
+    self._Maid:GiveTask(self.UI.InputEnded:Connect(function(input)
+        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+            self.dragging = false
+            self.UI.Position = self.startPos
+            self.dragStopped:Fire()
+            print('hi')
         end
     end))
 

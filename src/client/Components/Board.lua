@@ -5,7 +5,7 @@ local alphaTbl = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'}
 local numericTbl = {'1', '2', '3', '4', '5', '6', '7', '8'}
 
 local PieceSettings = require(game:GetService("ReplicatedStorage").Shared.PieceSettings)
-local Draggable = require(script.Parent.Draggable)
+local Draggable = require(script.Parent.Parent.Modules.Draggable)
 
 local Pieces = {
     Pawn = require(script.Parent.Pieces.Pawn),

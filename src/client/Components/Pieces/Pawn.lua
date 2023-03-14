@@ -21,14 +21,51 @@ function Pawn:GetMoveableSpaces()
     local numeric = string.sub(self.Square, 2, 2)
     local numericNum = tonumber(numeric)
 
+    local MovementController = Knit.GetController("MovementController")
+
     local squares = {}
+
+    local alphaTable = MovementController:GetAlpha()
+    local alphaIndex = table.find(alphaTable, alpha)
+
+    if (self.Color == "White") then
+        if (numericNum - 1 >= 1) then
+            local leftSquare = alphaTable[alphaIndex - 1]
+            local rightSquare = alphaTable[alphaIndex + 1]
+            if (leftSquare) then
+                if (self.Board:PieceOn(leftSquare .. (numericNum - 1)) ~= nil) then
+                    table.insert(squares, leftSquare .. (numericNum - 1))
+                end
+            end
+            if (rightSquare) then
+                if (self.Board:PieceOn(rightSquare .. (numericNum - 1)) ~= nil) then
+                    table.insert(squares, rightSquare .. (numericNum - 1))
+                end
+            end
+        end
+    else
+        if (numericNum + 1 <= 8) then
+            local leftSquare = alphaTable[alphaIndex - 1]
+            local rightSquare = alphaTable[alphaIndex + 1]
+            if (leftSquare) then
+                if (self.Board:PieceOn(leftSquare .. (numericNum + 1)) ~= nil) then
+                    table.insert(squares, rightSquare .. (numericNum + 1))
+                end
+            end
+            if (rightSquare) then
+                if (self.Board:PieceOn(rightSquare .. (numericNum + 1)) ~= nil) then
+                    table.insert(squares, rightSquare .. (numericNum + 1))
+                end
+            end
+        end
+    end
 
     if self.Color == "White" then
         if numericNum - 1 >= 1 then
             if (self.Board:PieceOn(alpha .. (numericNum - 1)) == nil) then
                 table.insert(squares, alpha .. (numericNum - 1))
             else
-                return {}
+                return squares
             end
         end
     else
@@ -36,7 +73,7 @@ function Pawn:GetMoveableSpaces()
             if (self.Board:PieceOn(alpha .. (numericNum + 1)) == nil) then
                 table.insert(squares, alpha .. (numericNum + 1))
             else
-                return {}
+                return squares
             end
         end
     end
