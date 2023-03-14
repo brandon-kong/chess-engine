@@ -16,11 +16,16 @@ end
 function BoardController:KnitStart()
     print("BoardController Started")
 
-    local BoardUI  = Knit.Player.PlayerGui.Game.Background.Board
-    local newBoard = Board.new(BoardUI)
+    local BoardUI  = Knit.Player.PlayerGui.Game.Background
+    local newBoard = Board.new(BoardUI.Board)
     newBoard:Initialize()
     
     newBoard:Mount()
+
+    BoardUI.Reset.MouseButton1Click:Connect(function()
+        newBoard:Reset()
+        newBoard:Mount()
+    end)
 end
 
 return BoardController

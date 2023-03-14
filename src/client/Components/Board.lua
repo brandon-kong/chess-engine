@@ -68,6 +68,8 @@ function Board.new(UI)
     self.MouseOver = nil
     self.selectedPieceOnBoard = nil
 
+    self.Turn = "White"
+
     return self
 end
 
@@ -76,6 +78,7 @@ function Board:Initialize()
         for j, k in pairs(v) do
             for _, l in pairs(k) do
                 local piece = Pieces[j].new(self, nil, i)
+                piece.id = self.NumPieces
                 self:PlacePiece(piece, l, true)
                 self.NumPieces += 1
 
@@ -131,7 +134,27 @@ function Board:PieceOn(Square)
     return self.Squares[alpha][numeric].Piece
 end
 
-function Board:ResetPieces()
+function Board:TakePiece(Square)
+    local piece = self:PieceOn(Square)
+    if (piece == nil) then
+        return
+    end
+
+    local alpha = string.sub(Square, 1, 1)
+    local numeric = string.sub(Square, 2, 2)
+
+    self.Squares[alpha][numeric].Piece = nil
+
+    if (piece.id == nil) then
+        return
+    end
+
+    self.UIPieces[piece.Color][piece.id]:Destroy()
+    table.insert(self.TakenPieces[piece.Color], piece)
+end
+
+function Board:Reset()
+    print('resetting')
     for i = 1, 8 do
         for j = 1, 8 do
             self.Squares[alphaTbl[i]][numericTbl[j]].Piece = nil
@@ -142,6 +165,42 @@ function Board:ResetPieces()
         White = {},
         Black = {},
     }
+
+    self.Pieces = {
+        White = {
+            King = nil,
+            Queen = nil,
+            Rook = {},
+            Bishop = {},
+            Knight = {},
+            Pawn = {},
+        },
+        Black = {
+            King = nil,
+            Queen = nil,
+            Rook = {},
+            Bishop = {},
+            Knight = {},
+            Pawn = {},
+        },
+    }
+
+
+    for i, v in pairs(self.UIPieces.White) do
+        v:Destroy()
+    end
+
+    for i, v in pairs(self.UIPieces.Black) do
+        v:Destroy()
+    end
+
+    self.lastColoredSquares = {}
+
+    self.MouseOver = nil
+    self.selectedPieceOnBoard = nil
+
+    self.Turn = "White"
+    self:Initialize()
 end
 
 function Board:PlacePiece(Piece, Square, init)
@@ -214,6 +273,8 @@ function Board:Mount()
                     button.TextTransparency = 1;
                     button.Active = false
 
+                    self.UIPieces[i][l.id] = newPiece
+
                     local d = Draggable.new(newPiece, self)
                     d:Connect()
 
@@ -233,12 +294,57 @@ function Board:Mount()
                             local rsquare = getSquareFromString(s)
                             rsquare.BackgroundColor3 = self.UISquareColors[s]
                         end
+                        if (self.Turn ~= l.Color) then
+                            self.selectedPieceOnBoard = nil
+                            return
+                        end
                         if (square ~= nil) then
                             if (table.find(validPieces, square) ~= nil) then
                                 if (self:PieceOn(square) == nil) then
                                     if (self.selectedPieceOnBoard ~= nil) then
                                         self:PlacePiece(l, square)
+                                        print("Moved " .. l.Name .. " to " .. square)
+
+                                        self.Turn = self.Turn == "White" and "Black" or "White"
+                                        print(self.Turn .. "'s turn")
                                         newPiece.Parent = getSquareFromString(square)
+                                    end
+                                else
+                                    -- there is a piece, so we need to check if it is the same color
+                                    local piece = self:PieceOn(square)
+                                    if (piece.Color ~= l.Color) then
+                                        -- it is not the same color, so we can take it
+                                        if (l.CanTake) then
+                                            if (not l:CanTake(square)) then
+                                                self.selectedPieceOnBoard = nil
+                                                return
+                                            end
+                                        end
+                                        if (self.selectedPieceOnBoard ~= nil) then
+                                            self:TakePiece(square)
+                                            self:PlacePiece(l, square)
+                                            print("Moved " .. l.Name .. " to " .. square)
+
+                                            self.Turn = self.Turn == "White" and "Black" or "White"
+                                            print(self.Turn .. "'s turn")
+                                            newPiece.Parent = getSquareFromString(square)
+                                        end
+                                    end
+                                end
+                            else
+                                if (self.selectedPieceOnBoard ~= nil) then
+                                    if (self.selectedPieceOnBoard == l) then
+                                        if l.Name == 'Pawn' then
+                                            if l:CanTake(square) then
+                                                self:TakePiece(square)
+                                                self:PlacePiece(l, square)
+                                                print("Moved " .. l.Name .. " to " .. square)
+
+                                                self.Turn = self.Turn == "White" and "Black" or "White"
+                                                print(self.Turn .. "'s turn")
+                                                newPiece.Parent = getSquareFromString(square)
+                                            end
+                                        end
                                     end
                                 end
                             end

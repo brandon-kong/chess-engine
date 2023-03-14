@@ -34,6 +34,10 @@ function MovementController:GetDiagonalSquaresFromSquare(Square, Board)
 
     local pieceOnBlock = Board:PieceOn(Square)
 
+    if not pieceOnBlock then
+        return squares
+    end
+
     local topRight, bottomRight, bottomLeft, topLeft = true, true, true, true
 
     for i = table.find(AlphaSquares, alpha)+1, #AlphaSquares do
@@ -112,6 +116,9 @@ function MovementController:GetVerticalSquaresFromSquare(Square, Board)
     local squares = {}
 
     local pieceOnBlock = Board:PieceOn(Square)
+    if not pieceOnBlock then
+        return squares
+    end
 
     local top, bottom = true, true
     for i = table.find(NumericSquares, numeric)+1, #NumericSquares do
@@ -152,6 +159,9 @@ function MovementController:GetHorizontalSquaresFromSquare(Square, Board)
     local squares = {}
     
     local pieceOnBlock = Board:PieceOn(Square)
+    if not pieceOnBlock then
+        return squares
+    end
 
     local top, bottom = true, true
     for i = table.find(AlphaSquares, alpha)+1, #AlphaSquares do
@@ -298,6 +308,7 @@ function MovementController:GetKingSquaresFromSquare(Square, Board)
     return squares
 end
 
+
 function MovementController:ColorSquares(Squares)
     local UI = Knit.Player.PlayerGui.Game.Background.Board.Contents
     for i = 1, #Squares do
@@ -306,6 +317,14 @@ function MovementController:ColorSquares(Squares)
             square.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
         end
     end
+end
+
+function MovementController:GetAlpha()
+    return AlphaSquares
+end
+
+function MovementController:GetNumeric()
+    return NumericSquares
 end
 
 return MovementController
