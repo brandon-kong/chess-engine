@@ -147,8 +147,10 @@ function ChessEngine:GetValidMoves()
 
     if (#moves == 0) then
         if (self.inCheck) then
+            self.checkMate = true
             print('CHECKMATE')
         else
+            self.staleMate = true
             print('STALEMATE')
         end
     else
@@ -190,34 +192,63 @@ function ChessEngine:GetMoveFunction(piece)
 end
 
 function ChessEngine:GetPawnMoves(row, col, moves)
+
+    local piecePinned = false
+    local pinDirection = {}
+
+    for i = 1, #self.pins do
+        local pin = self.pins[i]
+        if (pin[1] == row and pin[2] == col) then
+            piecePinned = true
+            pinDirection = {pin[3], pin[4]}
+            table.remove(self.pins, i)
+            break
+        end
+    end
+
     if (self.whitesTurn) then
         if (self.board[row-1]) then
-            if (self.board[row - 1][col] == '--') then
-                table.insert(moves, Move.new({row, col}, {row - 1, col}, self.board))
-                if (row == 7 and self.board[row - 2][col] == '--') then
-                    table.insert(moves, Move.new({row, col}, {row - 2, col}, self.board))
+            if not piecePinned or (pinDirection[1] == 0 and pinDirection[2] == -1) then
+                if (self.board[row - 1][col] == '--') then
+                    table.insert(moves, Move.new({row, col}, {row - 1, col}, self.board))
+                    if (row == 7 and self.board[row - 2][col] == '--') then
+                        table.insert(moves, Move.new({row, col}, {row - 2, col}, self.board))
+                    end
                 end
             end
+            --left capture
             if (col-1 >= 1 and self.board[row - 1][col - 1]:sub(1, 1) == 'b') then
-                table.insert(moves, Move.new({row, col}, {row - 1, col - 1}, self.board))
+                if not piecePinned or (pinDirection[1] == -1 and pinDirection[2] == -1) then
+                    table.insert(moves, Move.new({row, col}, {row - 1, col - 1}, self.board))
+                end
             end
+            --right capture
             if (col+1 <= 8 and self.board[row - 1][col + 1]:sub(1, 1) == 'b') then
-                table.insert(moves, Move.new({row, col}, {row - 1, col + 1}, self.board))
+                if not piecePinned or (pinDirection[1] == -1 and pinDirection[2] == 1) then
+                    table.insert(moves, Move.new({row, col}, {row - 1, col + 1}, self.board))
+            
+                end
             end
         end
     else
         if (self.board[row+1]) then
-            if (self.board[row + 1][col] == '--') then
-                table.insert(moves, Move.new({row, col}, {row + 1, col}, self.board))
-                if (row == 2 and self.board[row + 2][col] == '--') then
-                    table.insert(moves, Move.new({row, col}, {row + 2, col}, self.board))
+            if not piecePinned or (pinDirection[1] == 1 and pinDirection[2] == 0) then
+                if (self.board[row + 1][col] == '--') then
+                    table.insert(moves, Move.new({row, col}, {row + 1, col}, self.board))
+                    if (row == 2 and self.board[row + 2][col] == '--') then
+                        table.insert(moves, Move.new({row, col}, {row + 2, col}, self.board))
+                    end
                 end
             end
             if (col-1 >= 1 and self.board[row + 1][col - 1]:sub(1, 1) == 'w') then
-                table.insert(moves, Move.new({row, col}, {row + 1, col - 1}, self.board))
+                if not piecePinned or (pinDirection[1] == 1 and pinDirection[2] == -1) then
+                    table.insert(moves, Move.new({row, col}, {row + 1, col - 1}, self.board))
+                end
             end
             if (col+1 <= 8 and self.board[row + 1][col + 1]:sub(1, 1) == 'w') then
-                table.insert(moves, Move.new({row, col}, {row + 1, col + 1}, self.board))
+                if not piecePinned or (pinDirection[1] == 1 and pinDirection[2] == 1) then
+                    table.insert(moves, Move.new({row, col}, {row + 1, col + 1}, self.board))
+                end
             end
         end
     end
@@ -228,12 +259,23 @@ function ChessEngine:GetKnightMoves(row, col, moves)
         {-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {1, -2}, {1, 2}, {2, -1}, {2, 1}
     }
 
+    local piecePinned = false
+    for i = 1, #self.pins do
+        if (self.pins[i][1] == row and self.pins[i][2] == col) then
+            piecePinned = true
+            table.remove(self.pins, i)
+            break
+        end
+    end
+
     for _, move in ipairs(knightMoves) do
         local newRow = row + move[1]
         local newCol = col + move[2]
         if (newRow >= 1 and newRow <= 8 and newCol >= 1 and newCol <= 8) then
-            if (self.board[newRow][newCol]:sub(1, 1) ~= self.board[row][col]:sub(1, 1)) then
-                table.insert(moves, Move.new({row, col}, {newRow, newCol}, self.board))
+            if not piecePinned then
+                if (self.board[newRow][newCol]:sub(1, 1) ~= self.board[row][col]:sub(1, 1)) then
+                    table.insert(moves, Move.new({row, col}, {newRow, newCol}, self.board))
+                end
             end
         end
     end
@@ -244,20 +286,39 @@ function ChessEngine:GetRookMoves(row, col, moves)
         {-1, 0}, {1, 0}, {0, -1}, {0, 1}
     }
 
+    local piecePinned = false
+    local pinDirection = {}
+
+    for i = 1, #self.pins do
+        if (self.pins[i][1] == row and self.pins[i][2] == col) then
+            piecePinned = true
+            pinDirection = {self.pins[i][3], self.pins[i][4]}
+            if (self.board[row][col] ~= 'Q') then
+                table.remove(self.pins, i)
+            end
+            break
+        end
+    end
+
+    local enemyColor = self.whitesTurn and 'b' or 'w'
     for _, direction in ipairs(directions) do
-        local newRow = row + direction[1]
-        local newCol = col + direction[2]
-        while (newRow >= 1 and newRow <= 8 and newCol >= 1 and newCol <= 8) do
-            if (self.board[newRow][newCol] == '--') then
-                table.insert(moves, Move.new({row, col}, {newRow, newCol}, self.board))
-            else
-                if (self.board[newRow][newCol]:sub(1, 1) ~= self.board[row][col]:sub(1, 1)) then
-                    table.insert(moves, Move.new({row, col}, {newRow, newCol}, self.board))
+        for i = 1, 8 do
+            local newRow = row + direction[1] * i
+            local newCol = col + direction[2] * i
+            if (newRow >= 1 and newRow <= 8 and newCol >= 1 and newCol <= 8) then
+                if (not piecePinned or (pinDirection[1] == direction[1] and pinDirection[2] == direction[2]) or (pinDirection[1] == -direction[1] and pinDirection == -direction[2])) then
+                    if (self.board[newRow][newCol] == '--') then
+                        table.insert(moves, Move.new({row, col}, {newRow, newCol}, self.board))
+                    elseif (self.board[newRow][newCol]:sub(1, 1) == enemyColor) then
+                        table.insert(moves, Move.new({row, col}, {newRow, newCol}, self.board))
+                        break
+                    else
+                        break
+                    end
                 end
+            else
                 break
             end
-            newRow = newRow + direction[1]
-            newCol = newCol + direction[2]
         end
     end
 end
@@ -306,20 +367,40 @@ function ChessEngine:GetBishopMoves(row, col, moves)
         {-1, -1}, {-1, 1}, {1, -1}, {1, 1}
     }
 
+    local piecePinned = false
+    local pinDirection = {}
+
+    for i = 1, #self.pins do
+        if (self.pins[i][1] == row and self.pins[i][2] == col) then
+            piecePinned = true
+            pinDirection = {self.pins[i][3], self.pins[i][4]}
+            table.remove(self.pins, i)
+            break
+        end
+    end
+
+    local enemyColor = self.whitesTurn and 'b' or 'w'
     for _, direction in ipairs(directions) do
-        local newRow = row + direction[1]
-        local newCol = col + direction[2]
-        while (newRow >= 1 and newRow <= 8 and newCol >= 1 and newCol <= 8) do
-            if (self.board[newRow][newCol] == '--') then
-                table.insert(moves, Move.new({row, col}, {newRow, newCol}, self.board))
-            else
-                if (self.board[newRow][newCol]:sub(1, 1) ~= self.board[row][col]:sub(1, 1)) then
-                    table.insert(moves, Move.new({row, col}, {newRow, newCol}, self.board))
+        for i = 1, 7 do
+            local newRow = row + direction[1] * i
+            local newCol = col + direction[2] * i
+            if (newRow >= 1 and newRow <= 8 and newCol >= 1 and newCol <= 8) then
+                if (not piecePinned or (pinDirection[1] == direction[1] and pinDirection[2] == direction[2]) or (pinDirection[1] == -direction[1] and pinDirection == -direction[2])) then
+                local endPiece = self.board[newRow][newCol]
+                    if (endPiece:sub(1, 1) == enemyColor) then
+                        table.insert(moves, Move.new({row, col}, {newRow, newCol}, self.board))
+                        break
+                    elseif (endPiece == '--') then
+                        table.insert(moves, Move.new({row, col}, {newRow, newCol}, self.board))
+                    else
+                        break
+                    end
+                else
+                    break
                 end
+            else
                 break
             end
-            newRow = newRow + direction[1]
-            newCol = newCol + direction[2]
         end
     end
 end
@@ -382,17 +463,15 @@ function ChessEngine:CheckForPinsAndChecks()
             if 1 <= endRow and endRow <= 8 and 1 <= endCol and endCol <= 8 then
                 local endPiece = self.board[endRow][endCol]
                 local color = endPiece:sub(1, 1)
-                local type = endPiece:sub(2, 2)
-                if color == allyColor and type ~= 'K' then
-
-                        if possiblePin.length == 0 then
-                            possiblePin = {endRow, endCol, d[1], d[2]}
-                            print(possiblePin)
-                        else
-                            break
-                        end
+                local ptype = endPiece:sub(2, 2)
+                if color == allyColor and ptype ~= 'K' then
+                    if #possiblePin == 0 then
+                        possiblePin = {endRow, endCol, d[1], d[2]}
+                    else
+                        break
+                    end
                 elseif color == enemyColor then
-                    if (type == 'R' and j >= 1 and j <= 4) or (type == 'B' and j >= 5 and j <= 8) or (type == 'P' and i == 1 and ((enemyColor == 'w' and j >= 7 and j <= 8) or (enemyColor == 'b' and j >= 5 and j <= 6))) or (type == 'Q') or (i == 1 and type == 'K') then
+                    if (ptype == 'R' and j >= 1 and j <= 4) or (ptype == 'B' and j >= 5 and j <= 8) or (ptype == 'P' and i == 1 and ((enemyColor == 'w' and j >= 7 and j <= 8) or (enemyColor == 'b' and j >= 5 and j <= 6))) or (ptype == 'Q') or (i == 1 and ptype == 'K') then
                         if #possiblePin == 0 then
                             inCheck = true
                             table.insert(checks, {endRow, endCol, d[1], d[2]})
