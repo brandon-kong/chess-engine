@@ -36,6 +36,12 @@ function ChessEngine.new()
     self.moveLog = {}
     
     self.whitesTurn = true
+    self.wKing = {8, 5}
+    self.bKing = {1, 5}
+
+    self.inCheck = false
+    self.pins = {}
+    self.checks = {}
 
     return setmetatable(self, ChessEngine)
 end
@@ -47,9 +53,15 @@ end
 function ChessEngine:MakeMove(moveObj)
     self.board[moveObj.startRow][moveObj.startCol] = '--'
     self.board[moveObj.endRow][moveObj.endCol] = moveObj.pieceMoved
-    print(moveObj)
     self.whitesTurn = not self.whitesTurn -- switch turns
+
     table.insert(self.moveLog, moveObj)
+
+    if (moveObj.pieceMoved == 'wK') then
+        self.wKing = {moveObj.endRow, moveObj.endCol}
+    elseif (moveObj.pieceMoved == 'bK') then
+        self.bKing = {moveObj.endRow, moveObj.endCol}
+    end
 end
 
 function ChessEngine:UndoMove()
@@ -72,7 +84,78 @@ function ChessEngine:UndoMove()
 end
 
 function ChessEngine:GetValidMoves()
-    return self:GetPossibleMoves()
+    local moves = {}
+    self.inCheck, self.pins, self.checks = self:CheckForPinsAndChecks()
+
+    local kingRow, kingCol
+    if self.whitesTurn then
+        kingRow = self.wKing[1]
+        kingCol = self.wKing[2]
+    else
+        kingRow = self.bKing[1]
+        kingCol = self.bKing[2]
+    end
+
+    if (self.inCheck) then
+        if (#self.checks == 1) then
+            moves = self:GetPossibleMoves()
+            local check = self.checks[1]
+            local checkRow = check[1]
+            local checkCol = check[2]
+            local pieceChecking = self.board[checkRow][checkCol]
+            print('pieceChecking: ' .. pieceChecking)
+            local validSquares = {}
+
+            if (pieceChecking:sub(2, 2) == 'N') then
+                validSquares = {{checkRow, checkCol}}
+            else
+                for i = 1, 8 do
+                    local validSquare = {kingRow + check[3] * i, kingCol + check[4] * i}
+                    table.insert(validSquares, validSquare)
+                    if (validSquare[1] == checkRow and validSquare[2] == checkCol) then
+                        break
+                    end
+                end
+            end
+
+            for i = #moves, 1, -1 do
+                
+                if (moves[i] and moves[i].pieceMoved:sub(2, 2) ~= 'K') then
+                    local moveValid = false
+                    for j = 1, #validSquares do
+                        if (moves[i].endRow == validSquares[j][1] and moves[i].endCol == validSquares[j][2]) then
+                            moveValid = true
+                            break
+                        end
+                    end
+                    if (not moveValid) then
+                        table.remove(moves, i)
+                    end
+                else
+                    print('hi')
+                end
+            end
+        else
+            -- double check, king has to move
+            self:GetKingMoves(kingRow, kingCol, moves)
+        end
+    else
+        moves = self:GetPossibleMoves()
+    end
+
+    --[[ Stalemate ]]
+
+    if (#moves == 0) then
+        if (self.inCheck) then
+            print('CHECKMATE')
+        else
+            print('STALEMATE')
+        end
+    else
+        --print('VALID MOVES')
+    end
+
+    return moves
 end
 
 function ChessEngine:GetPossibleMoves()
@@ -189,12 +272,30 @@ function ChessEngine:GetKingMoves(row, col, moves)
         {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}
     }
 
+    local allyColor = self.whitesTurn and 'w' or 'b'
+
     for _, move in ipairs(kingMoves) do
         local newRow = row + move[1]
         local newCol = col + move[2]
         if (newRow >= 1 and newRow <= 8 and newCol >= 1 and newCol <= 8) then
-            if (self.board[newRow][newCol]:sub(1, 1) ~= self.board[row][col]:sub(1, 1)) then
-                table.insert(moves, Move.new({row, col}, {newRow, newCol}, self.board))
+            local endPiece = self.board[newRow][newCol]
+            if (endPiece:sub(1, 1) ~= allyColor) then
+                if (allyColor == 'w') then
+                    self.wKing = {newRow, newCol}
+                else
+                    self.bKing = {newRow, newCol}
+                end
+
+                local inCheck, pins, checks = self:CheckForPinsAndChecks()
+                if (not inCheck) then
+                    table.insert(moves, Move.new({row, col}, {newRow, newCol}, self.board))
+                end
+
+                if (allyColor == 'w') then
+                    self.wKing = {row, col}
+                else
+                    self.bKing = {row, col}
+                end
             end
         end
     end
@@ -221,6 +322,113 @@ function ChessEngine:GetBishopMoves(row, col, moves)
             newCol = newCol + direction[2]
         end
     end
+end
+
+function ChessEngine:isInCheck()
+    if (self.whitesTurn) then
+        return self:squareUnderAttack(self.wKing[1], self.wKing[2])
+    else
+        return self:squareUnderAttack(self.bKing[1], self.bKing[2])
+    end
+end
+
+function ChessEngine:squareUnderAttack(row, col)
+    self.whitesTurn = not self.whitesTurn
+    local moves = self:GetPossibleMoves()
+    self.whitesTurn = not self.whitesTurn
+
+    for _, move in ipairs(moves) do
+        if (move.endRow == row and move.endCol == col) then
+            return true
+        end
+    end
+
+    return false
+end
+
+function ChessEngine:CheckForPinsAndChecks()
+    local pins = {}
+    local checks = {}
+
+    local enemyColor
+    local allyColor
+    local startRow
+    local startCol
+    local inCheck = false
+
+    if (self.whitesTurn) then
+        enemyColor = 'b'
+        allyColor = 'w'
+        startRow = self.wKing[1]
+        startCol = self.wKing[2]
+    else
+        enemyColor = 'w'
+        allyColor = 'b'
+        startRow = self.bKing[1]
+        startCol = self.bKing[2]
+    end
+
+    local directions = {
+        {-1, 0}, {0, -1}, {1, 0}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}
+    }
+
+    for j = 1, #directions do
+        local d = directions[j]
+        local possiblePin = {}
+
+        for i = 1, 8 do
+            local endRow = startRow + d[1] * i
+            local endCol = startCol + d[2] * i
+            if 1 <= endRow and endRow <= 8 and 1 <= endCol and endCol <= 8 then
+                local endPiece = self.board[endRow][endCol]
+                local color = endPiece:sub(1, 1)
+                local type = endPiece:sub(2, 2)
+                if color == allyColor and type ~= 'K' then
+
+                        if possiblePin.length == 0 then
+                            possiblePin = {endRow, endCol, d[1], d[2]}
+                            print(possiblePin)
+                        else
+                            break
+                        end
+                elseif color == enemyColor then
+                    if (type == 'R' and j >= 1 and j <= 4) or (type == 'B' and j >= 5 and j <= 8) or (type == 'P' and i == 1 and ((enemyColor == 'w' and j >= 7 and j <= 8) or (enemyColor == 'b' and j >= 5 and j <= 6))) or (type == 'Q') or (i == 1 and type == 'K') then
+                        if #possiblePin == 0 then
+                            inCheck = true
+                            table.insert(checks, {endRow, endCol, d[1], d[2]})
+                        else
+                            table.insert(pins, possiblePin)
+                            break
+                        end
+                    else
+                        break
+                    end
+
+                end
+
+            else
+                break
+            end
+        end
+    end
+
+    local knightMoves = {
+        {-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {1, -2}, {1, 2}, {2, -1}, {2, 1}
+    }
+
+    for _, move in ipairs(knightMoves) do
+        local endRow = startRow + move[1]
+        local endCol = startCol + move[2]
+        if 1 <= endRow and endRow <= 8 and 1 <= endCol and endCol <= 8 then
+            local endPiece = self.board[endRow][endCol]
+            if endPiece ~= '--' and endPiece:sub(1, 1) == enemyColor and endPiece:sub(2, 2) == 'N' then
+                inCheck = true
+                table.insert(checks, {endRow, endCol, move[1], move[2]})
+            end
+        end
+    end
+
+    return inCheck, pins, checks, {startRow, startCol}
 end
 
 return ChessEngine

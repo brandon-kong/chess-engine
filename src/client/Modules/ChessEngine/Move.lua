@@ -32,7 +32,7 @@ function Move:GetRankFileNotation(row, col)
     return files[col] .. ranks[row]
 end
 
-function Move:__tostring()
+function Move:tostring()
     return self:GetNotation()
 end
 
