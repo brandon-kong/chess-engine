@@ -5,6 +5,7 @@
 
 #include <string>
 #include <iostream>
+#include <map>
 
 const uint64_t PAWN = 6;
 const uint64_t KNIGHT = 5;
@@ -24,6 +25,12 @@ const uint64_t EMPTY = 0;
 const int BOARD_SIZE = 8;
 const int BOARD_SQUARES = 64;
 
+// Piece image map
+
+const std::string PIECE_IMAGE_MAP[6] = { "pawn.png", "knight.png", "bishop.png", "rook.png", "queen.png", "king.png" };
+const std::map<uint64_t, std::string> PIECE_MAP = {
+{PAWN, "pawn.png"}, {KNIGHT, "knight.png"}, {BISHOP, "bishop.png"}, {ROOK, "rook.png"}, {QUEEN, "queen.png"}, {KING, "king.png"} };
+
 // Board square constants
 
 class Bitboard
@@ -38,6 +45,8 @@ public:
 	void printBoard() const;
 	int getPieceType(int square) const;
 	int getPieceColor(int square) const;
+
+	std::string getPieceSprite(uint64_t piece) const;
 
 	void clearBoard();
 

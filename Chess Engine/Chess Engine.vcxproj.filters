@@ -19,8 +19,8 @@
     <Filter Include="Header Files\include">
       <UniqueIdentifier>{ac92226e-487d-446d-badb-b63afaae77c8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Chess_Pieces">
-      <UniqueIdentifier>{8ffe2900-cc97-461e-a44e-8c3a3530e2df}</UniqueIdentifier>
+    <Filter Include="Resource Files\chess_pieces">
+      <UniqueIdentifier>{6fdcb224-11a1-437b-bffd-ddbe8ae6cfd3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -53,5 +53,46 @@
     <ClInclude Include="resource1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\black_bishop.png">
+      <Filter>Resource Files\chess_pieces</Filter>
+    </Image>
+    <Image Include="resources\black_king.png">
+      <Filter>Resource Files\chess_pieces</Filter>
+    </Image>
+    <Image Include="resources\black_knight.png">
+      <Filter>Resource Files\chess_pieces</Filter>
+    </Image>
+    <Image Include="resources\black_pawn.png">
+      <Filter>Resource Files\chess_pieces</Filter>
+    </Image>
+    <Image Include="resources\black_queen.png">
+      <Filter>Resource Files\chess_pieces</Filter>
+    </Image>
+    <Image Include="resources\black_rook.png">
+      <Filter>Resource Files\chess_pieces</Filter>
+    </Image>
+    <Image Include="resources\white_bishop.png">
+      <Filter>Resource Files\chess_pieces</Filter>
+    </Image>
+    <Image Include="resources\white_king.png">
+      <Filter>Resource Files\chess_pieces</Filter>
+    </Image>
+    <Image Include="resources\white_knight.png">
+      <Filter>Resource Files\chess_pieces</Filter>
+    </Image>
+    <Image Include="resources\white_pawn.png">
+      <Filter>Resource Files\chess_pieces</Filter>
+    </Image>
+    <Image Include="resources\white_queen.png">
+      <Filter>Resource Files\chess_pieces</Filter>
+    </Image>
+    <Image Include="resources\white_rook.png">
+      <Filter>Resource Files\chess_pieces</Filter>
+    </Image>
   </ItemGroup>
 </Project>

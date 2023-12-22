@@ -141,6 +141,21 @@
     <ClInclude Include="include\Graphics_Handler.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
+    <ClInclude Include="resource2.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\black_bishop.png" />
+    <Image Include="resources\black_king.png" />
+    <Image Include="resources\black_knight.png" />
+    <Image Include="resources\black_pawn.png" />
+    <Image Include="resources\black_queen.png" />
+    <Image Include="resources\black_rook.png" />
+    <Image Include="resources\white_bishop.png" />
+    <Image Include="resources\white_king.png" />
+    <Image Include="resources\white_knight.png" />
+    <Image Include="resources\white_pawn.png" />
+    <Image Include="resources\white_queen.png" />
+    <Image Include="resources\white_rook.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

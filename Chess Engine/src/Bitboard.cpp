@@ -120,3 +120,16 @@ void Bitboard::loadFEN(std::string fen)
 		}
 	}
 }
+
+std::string Bitboard::getPieceSprite(uint64_t piece) const
+{
+	uint64_t type = piece & (PAWN | KNIGHT | BISHOP | ROOK | QUEEN | KING);
+	uint64_t color = piece & (WHITE | BLACK);
+
+	std::string pieceString = PIECE_MAP.at(type);
+	pieceString = color == WHITE ? "white_" + pieceString : "black_" + pieceString;
+
+	pieceString = "include\\resources\\" + pieceString;
+
+	return pieceString;
+}

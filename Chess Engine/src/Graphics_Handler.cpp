@@ -60,8 +60,6 @@ void Graphics_Handler::drawPieces(const Bitboard& board)
 	for (int i = 0; i < BOARD_SQUARES; i++)
 	{
 
-		std::cout << boardVector[i] << std::endl;
-
 		int piece = boardVector[i];
 
 		if (piece == EMPTY)
@@ -85,7 +83,7 @@ void Graphics_Handler::drawPieces(const Bitboard& board)
 			switch (pieceType) {
 				case PAWN:
 
-					pieceTexture.loadFromFile("")
+					//pieceTexture.loadFromFile("");
 					break;
 			}
 		}
