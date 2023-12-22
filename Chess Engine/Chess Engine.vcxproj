@@ -130,11 +130,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\chess_engine.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Bitboard.cpp" />
+    <ClCompile Include="src\Chess_Engine.cpp" />
+    <ClCompile Include="src\Graphics_Handler.cpp" />
+    <ClCompile Include="src\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\chess_engine.h" />
+    <ClInclude Include="include\Bitboard.h" />
+    <ClInclude Include="include\Chess_Engine.h" />
+    <ClInclude Include="include\Graphics_Handler.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

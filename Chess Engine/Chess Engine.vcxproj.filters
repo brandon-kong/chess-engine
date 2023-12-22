@@ -19,18 +19,39 @@
     <Filter Include="Header Files\include">
       <UniqueIdentifier>{ac92226e-487d-446d-badb-b63afaae77c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Chess_Pieces">
+      <UniqueIdentifier>{8ffe2900-cc97-461e-a44e-8c3a3530e2df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp">
+    <ClCompile Include="src\Main.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\chess_engine.cpp">
+    <ClCompile Include="src\Chess_Engine.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics_Handler.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bitboard.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\chess_engine.h">
+    <ClInclude Include="include\Chess_Engine.h">
       <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bitboard.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Graphics_Handler.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

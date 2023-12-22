@@ -1,24 +1,30 @@
 #include <SFML/Graphics.hpp>
+#include "Graphics_Handler.h"
 
 int main()
 {
+	Graphics_Handler graphics_handler = Graphics_Handler();
 
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Chess Engine");
+	sf::RenderWindow* window = graphics_handler.getWindow();
 
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            // Close window: exit
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
+	Bitboard board;
 
-        window.clear(sf::Color::Black);
+	board.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
-        // Draw the sprite
-        window.display();
-    }
-        return 0;
+	while (window->isOpen())
+	{
+		sf::Event event;
+		while (window->pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window->close();
+		}
+
+		graphics_handler.clear();
+
+		graphics_handler.drawSquares(board);
+		graphics_handler.drawPieces(board);
+
+		graphics_handler.display();
+	}
 }
