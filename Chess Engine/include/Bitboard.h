@@ -16,9 +16,12 @@ const uint64_t QUEEN = 2;
 const uint64_t KING = 1;
 
 const uint64_t WHITE = 8;
-const uint64_t BLACK = 16;
+const uint64_t BLACK = 0;
 
 const uint64_t EMPTY = 0;
+
+const int WHITE_TURN = 1;
+const int BLACK_TURN = 0;
 
 
 // Board constants
@@ -59,14 +62,17 @@ public:
 
 	// Board manipulation
 
-	uint64_t getTurn() const;
+	int getTurn() const;
 	void setTurn(int turn);
 
-	void move(int from, int to);
+	bool move(int from, int to);
 
 	// Valid moves
 
-	std::vector<int> getValidPositions(int square);
+	std::vector<int> getValidPositions(int square) const;
+	bool isValidMove(int from, int to) const;
+
+	bool pieceIsTurn(int square) const;
 
 
 

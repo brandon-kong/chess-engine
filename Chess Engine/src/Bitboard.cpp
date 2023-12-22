@@ -11,7 +11,7 @@ Bitboard::Bitboard()
 		board[i] = 0;
 	}
 
-	turn = WHITE;
+	turn = WHITE_TURN;
 }
 
 Bitboard::~Bitboard()
@@ -121,6 +121,8 @@ void Bitboard::loadFEN(std::string fen)
 			square++;
 		}
 	}
+
+	setTurn(WHITE_TURN);
 }
 
 std::string Bitboard::getPieceSprite(uint64_t piece) const
@@ -141,7 +143,7 @@ int Bitboard::getSquare(int x, int y)
 	return y * BOARD_SIZE + x;
 }
 
-uint64_t Bitboard::getTurn() const
+int Bitboard::getTurn() const
 {
 	return turn;
 }
@@ -151,22 +153,36 @@ void Bitboard::setTurn(int turn)
 	this->turn = turn;
 }
 
-void Bitboard::move(int from, int to)
+bool Bitboard::move(int from, int to)
 {
+
+	// Check if the move is valid
+
+	if (!isValidMove(from, to))
+	{
+		return false;
+	}
+
 	board[to] = board[from];
 	board[from] = EMPTY;
 
-	turn = turn == WHITE ? BLACK : WHITE;
+	std::cout << (turn) << std::endl;
+
+	setTurn((turn == WHITE_TURN) ? BLACK_TURN : WHITE_TURN);
+
+	std::cout << (turn) << std::endl;
+
+
+
+	return true;
 }
 
-std::vector<int> Bitboard::getValidPositions(int square)
+std::vector<int> Bitboard::getValidPositions(int square) const
 {
 	std::vector<int> validPositions;
 
 	int piece = getPieceType(square);
 	int color = getPieceColor(square);
-
-	std::cout << piece << std::endl;
 
 	if (piece == PAWN)
 	{
@@ -207,14 +223,20 @@ std::vector<int> Bitboard::getValidPositions(int square)
 		int x = square % BOARD_SIZE;
 		int y = square / BOARD_SIZE;
 
-		int positions[8] = { getSquare(x - 1, y - 2), getSquare(x + 1, y - 2), getSquare(x - 2, y - 1), getSquare(x + 2, y - 1), getSquare(x - 2, y + 1), getSquare(x + 2, y + 1), getSquare(x - 1, y + 2), getSquare(x + 1, y + 2) };
+		int xOffset[] = { -1, 1, -2, 2, -2, 2, -1, 1 };
+		int yOffset[] = { -2, -2, -1, -1, 1, 1, 2, 2 };
 
 		for (int i = 0; i < 8; i++)
 		{
-			int position = positions[i];
+			int newX = x + xOffset[i];
+			int newY = y + yOffset[i];
 
-			if (position >= 0 && position < BOARD_SQUARES)
+			int position = getSquare(newX, newY);
+
+			if (newX >= 0 && newX < BOARD_SIZE && newY >= 0 && newY < BOARD_SIZE)
 			{
+				int position = getSquare(newX, newY);
+
 				if (getPieceType(position) == EMPTY || getPieceColor(position) != color)
 				{
 					validPositions.push_back(position);
@@ -227,18 +249,168 @@ std::vector<int> Bitboard::getValidPositions(int square)
 		int x = square % BOARD_SIZE;
 		int y = square / BOARD_SIZE;
 
-		int	position = getSquare(x - 1, y - 1);
+		// handle sliding diagonally
 
-		while (position >= 0 && position < BOARD_SQUARES && getPieceType(position) == EMPTY)
+		int xOffset[] = { -1, 1, -1, 1 };
+		int yOffset[] = { -1, -1, 1, 1 };
+
+		for (int i = 0; i < 4; i++)
 		{
-			validPositions.push_back(position);
+			int newX = x + xOffset[i];
+			int newY = y + yOffset[i];
 
-			x = position % BOARD_SIZE;
-			y = position / BOARD_SIZE;
+			while (newX >= 0 && newX < BOARD_SIZE && newY >= 0 && newY < BOARD_SIZE)
+			{
+				int position = getSquare(newX, newY);
 
-			position = getSquare(x - 1, y - 1);
+				if (getPieceType(position) == EMPTY)
+				{
+					validPositions.push_back(position);
+				}
+				else if (getPieceColor(position) != color)
+				{
+					validPositions.push_back(position);
+					break;  // Stop sliding if you encounter a piece of the opposite color
+				}
+				else
+				{
+					break;  // Stop sliding if you encounter your own piece
+				}
+
+				newX += xOffset[i];
+				newY += yOffset[i];
+			}
+		}
+	}
+
+	else if (piece == QUEEN)
+	{
+		int x = square % BOARD_SIZE;
+		int y = square / BOARD_SIZE;
+
+		// handle sliding
+
+		int xOffset[] = { -1, 1, 0, 0, -1, 1, -1, 1 };
+		int yOffset[] = { 0, 0, -1, 1, -1, 1, 1, -1 };
+
+		for (int i = 0; i < 8; i++)
+		{
+			int newX = x + xOffset[i];
+			int newY = y + yOffset[i];
+
+			while (newX >= 0 && newX < BOARD_SIZE && newY >= 0 && newY < BOARD_SIZE)
+			{
+				int position = getSquare(newX, newY);
+
+				if (getPieceType(position) == EMPTY)
+				{
+					validPositions.push_back(position);
+				}
+				else if (getPieceColor(position) != color)
+				{
+					validPositions.push_back(position);
+					break; 
+				}
+				else
+				{
+					break;
+				}
+
+				newX += xOffset[i];
+				newY += yOffset[i];
+			}
+		}
+
+		
+	}
+	
+	else if (piece == KING)
+	{
+		int x = square % BOARD_SIZE;
+		int y = square / BOARD_SIZE;
+
+		int xOffset[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
+		int yOffset[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
+
+		for (int i = 0; i < 8; i++)
+		{
+			int newX = x + xOffset[i];
+			int newY = y + yOffset[i];
+
+			int position = getSquare(newX, newY);
+
+			if (newX >= 0 && newX < BOARD_SIZE && newY >= 0 && newY < BOARD_SIZE)
+			{
+				int position = getSquare(newX, newY);
+
+				if (getPieceType(position) == EMPTY || getPieceColor(position) != color)
+				{
+					validPositions.push_back(position);
+				}
+			}		
+		}
+	}
+
+	else if (piece == ROOK)
+	{
+		int x = square % BOARD_SIZE;
+		int y = square / BOARD_SIZE;
+
+		int xOffset[] = { -1, 1, 0, 0 };
+		int yOffset[] = { 0, 0, -1, 1 };
+
+		for (int i = 0; i < 4; i++)
+		{
+			int newX = x + xOffset[i];
+			int newY = y + yOffset[i];
+
+			while (newX >= 0 && newX < BOARD_SIZE && newY >= 0 && newY < BOARD_SIZE)
+			{
+				int position = getSquare(newX, newY);
+
+				if (getPieceType(position) == EMPTY)
+				{
+					validPositions.push_back(position);
+				}
+				else if (getPieceColor(position) != color)
+				{
+					validPositions.push_back(position);
+					break;
+				}
+				else
+				{
+					break;
+				}
+
+				newX += xOffset[i];
+				newY += yOffset[i];
+			}
 		}
 	}
 
 	return validPositions;
+}
+
+bool Bitboard::isValidMove(int from, int to) const
+{
+	std::vector<int> validPositions = getValidPositions(from);
+
+	for (int i = 0; i < validPositions.size(); i++)
+	{
+		if (validPositions[i] == to)
+		{
+		return true;
+	}
+}
+
+	return false;
+}
+
+bool Bitboard::pieceIsTurn(int square) const
+{
+	uint64_t color = getPieceColor(square);
+
+	std::cout << (color) << std::endl;
+
+	return (color == WHITE && turn == WHITE_TURN) || (color == BLACK && turn == BLACK_TURN);
 }

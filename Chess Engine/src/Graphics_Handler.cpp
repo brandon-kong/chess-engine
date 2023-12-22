@@ -84,7 +84,6 @@ void Graphics_Handler::drawPieces(const Bitboard& board)
 		// Get piece type
 
 		int pieceType = board.getPieceType(i);
-
 		int pieceColor = board.getPieceColor(i);
 
 		sf::Texture pieceTexture;
@@ -108,12 +107,11 @@ void Graphics_Handler::drawPieces(const Bitboard& board)
 		
 		pieceShape.setPosition((i % BOARD_SIZE) * SQUARE_SIZE + xOffset, (i / BOARD_SIZE) * SQUARE_SIZE + yOffset);
 
-
 		(*window).draw(pieceShape);
 	}		
 }
 
-void Graphics_Handler::drawValidPositions(Bitboard board, int square)
+void Graphics_Handler::drawValidPositions(const Bitboard& board, int square)
 {
 	// Get the valid positions for the piece on the square
 
@@ -131,7 +129,6 @@ void Graphics_Handler::drawValidPositions(Bitboard board, int square)
 		sf::Sprite circle;
 		circle.setTexture(circleTexture);
 		
-		//circle.setScale(0.5f, 0.5f);
 		float xOffset = (SQUARE_SIZE - circle.getGlobalBounds().width) / 2.0f;
 		float yOffset = (SQUARE_SIZE - circle.getGlobalBounds().height) / 2.0f;
 
@@ -142,7 +139,7 @@ void Graphics_Handler::drawValidPositions(Bitboard board, int square)
 	}
 }
 
-void Graphics_Handler::handleInput(sf::Event event, Bitboard board)
+void Graphics_Handler::handleInput(sf::Event event, Bitboard& board)
 {
 	if (event.type == sf::Event::Closed)
 	{
@@ -160,12 +157,14 @@ void Graphics_Handler::handleInput(sf::Event event, Bitboard board)
 
 			int square = Bitboard::getSquare(x, y);
 
-			uint64_t turn = board.getTurn();
+			int turn = board.getTurn();
 
 			int piece = board.getPieceType(square);
 			int color = board.getPieceColor(square);
 
-			if (piece != EMPTY && color == turn)
+			bool pieceIsTurn = board.pieceIsTurn(square);
+
+			if (piece != EMPTY && pieceIsTurn)
 			{
 				// Color the square
 
@@ -177,6 +176,20 @@ void Graphics_Handler::handleInput(sf::Event event, Bitboard board)
 				else {
 					selectedSquare = square;
 				}
+			}
+			else if (selectedSquare != -1)
+			{
+				// Move the piece
+
+				bool moved = board.move(selectedSquare, square);
+
+				if (moved)
+				{
+					selectedSquare = -1;
+				}
+
+				// redraw the board
+				
 			}
 		}
 	}

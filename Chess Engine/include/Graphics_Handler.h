@@ -38,12 +38,12 @@ public:
 	// Display the window
 	void display();
 
-	void handleInput(sf::Event event, const Bitboard board);
+	void handleInput(sf::Event event, Bitboard& board);
 
 	// Draw the squares of the board
 	void drawSquares(const Bitboard& board);
 	void drawPieces(const Bitboard& board);
-	void drawValidPositions(Bitboard board, int square);
+	void drawValidPositions(const Bitboard& board, int square);
 
 	int getSelectedSquare() const;
 

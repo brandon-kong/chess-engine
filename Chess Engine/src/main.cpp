@@ -18,8 +18,7 @@ int main()
 		{
 			graphics_handler.handleInput(event, board);
 		}
-
-
+		
 		graphics_handler.clear();
 
 		graphics_handler.drawSquares(board);
