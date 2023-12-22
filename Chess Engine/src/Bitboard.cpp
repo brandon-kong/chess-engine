@@ -129,7 +129,7 @@ std::string Bitboard::getPieceSprite(uint64_t piece) const
 	std::string pieceString = PIECE_MAP.at(type);
 	pieceString = color == WHITE ? "white_" + pieceString : "black_" + pieceString;
 
-	pieceString = "include\\resources\\" + pieceString;
+	pieceString = "resources\\" + pieceString;
 
 	return pieceString;
 }

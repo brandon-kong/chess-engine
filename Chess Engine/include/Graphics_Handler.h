@@ -13,6 +13,9 @@ const static float WINDOW_HEIGHT = BOARD_SIZE * SQUARE_SIZE;
       
 static std::string WINDOW_TITLE = "Chess Engine";
 
+const static sf::Color LIGHT_SQUARE_COLOR = sf::Color(232, 237, 249);
+const static sf::Color DARK_SQUARE_COLOR = sf::Color(183, 192, 216);
+
 class Graphics_Handler
 {
 public:

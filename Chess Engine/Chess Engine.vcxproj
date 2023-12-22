@@ -139,9 +139,6 @@
     <ClInclude Include="include\Bitboard.h" />
     <ClInclude Include="include\Chess_Engine.h" />
     <ClInclude Include="include\Graphics_Handler.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="resource1.h" />
-    <ClInclude Include="resource2.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\black_bishop.png" />

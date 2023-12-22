@@ -43,11 +43,11 @@ void Graphics_Handler::drawSquares(const Bitboard& board)
 			square.setPosition(i * SQUARE_SIZE, j * SQUARE_SIZE);
 			if ((i + j) % 2 == 0)
 			{
-				square.setFillColor(sf::Color(255, 228, 196));
+				square.setFillColor(LIGHT_SQUARE_COLOR);
 			}
 			else
 			{
-				square.setFillColor(sf::Color(139, 69, 19));
+				square.setFillColor(DARK_SQUARE_COLOR);
 			}
 			(*window).draw(square);
 		}
@@ -76,23 +76,27 @@ void Graphics_Handler::drawPieces(const Bitboard& board)
 		sf::Texture pieceTexture;
 		sf::Sprite pieceShape;
 
-		pieceShape.setPosition((i % BOARD_SIZE) * SQUARE_SIZE, (i / BOARD_SIZE) * SQUARE_SIZE);
-		//pieceShape.setOrigin(SQUARE_SIZE / 2, SQUARE_SIZE / 2);
+		std::string spritePath = board.getPieceSprite(piece);
 
-		if (pieceColor == WHITE) {
-			switch (pieceType) {
-				case PAWN:
+		pieceTexture.loadFromFile(spritePath);
 
-					//pieceTexture.loadFromFile("");
-					break;
-			}
-		}
-		else {
-			// Black pieces
-		}
-
+		pieceTexture.setSmooth(true);
 		pieceShape.setTexture(pieceTexture);
-		pieceShape.setPosition((i % BOARD_SIZE) * SQUARE_SIZE, (i / BOARD_SIZE) * SQUARE_SIZE);
+		// Center the piece to the square
+
+		// Center the piece within the square
+		
+		
+		float xOffset = (SQUARE_SIZE - pieceShape.getGlobalBounds().width) / 2.0f;
+		float yOffset = (SQUARE_SIZE - pieceShape.getGlobalBounds().height) / 2.0f;
+		
+		
+		
+		pieceShape.setPosition((i % BOARD_SIZE) * SQUARE_SIZE + xOffset, (i / BOARD_SIZE) * SQUARE_SIZE + yOffset);
+
+		
+		
+
 		(*window).draw(pieceShape);
 	}		
 }
