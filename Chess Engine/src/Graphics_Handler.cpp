@@ -115,6 +115,11 @@ void Graphics_Handler::drawValidPositions(const Bitboard& board, int square)
 {
 	// Get the valid positions for the piece on the square
 
+	if (selectedSquare == -1)
+	{
+		return;
+	}
+
 	std::vector<int> validPositions = board.getValidPositions(square);
 
 	for (int i = 0; i < validPositions.size(); i++)
@@ -183,10 +188,7 @@ void Graphics_Handler::handleInput(sf::Event event, Bitboard& board)
 
 				bool moved = board.move(selectedSquare, square);
 
-				if (moved)
-				{
-					selectedSquare = -1;
-				}
+				selectedSquare = -1;
 
 				// redraw the board
 				

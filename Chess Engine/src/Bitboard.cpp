@@ -410,7 +410,5 @@ bool Bitboard::pieceIsTurn(int square) const
 {
 	uint64_t color = getPieceColor(square);
 
-	std::cout << (color) << std::endl;
-
 	return (color == WHITE && turn == WHITE_TURN) || (color == BLACK && turn == BLACK_TURN);
 }
