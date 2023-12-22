@@ -16,14 +16,15 @@ int main()
 		sf::Event event;
 		while (window->pollEvent(event))
 		{
-			if (event.type == sf::Event::Closed)
-				window->close();
+			graphics_handler.handleInput(event, board);
 		}
+
 
 		graphics_handler.clear();
 
 		graphics_handler.drawSquares(board);
 		graphics_handler.drawPieces(board);
+		graphics_handler.drawValidPositions(board, graphics_handler.getSelectedSquare());
 
 		graphics_handler.display();
 	}

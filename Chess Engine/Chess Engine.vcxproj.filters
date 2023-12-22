@@ -85,5 +85,8 @@
     <Image Include="resources\white_rook.png">
       <Filter>Resource Files\chess_pieces</Filter>
     </Image>
+    <Image Include="resources\valid_square.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

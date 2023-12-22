@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <vector>
 
 const uint64_t PAWN = 6;
 const uint64_t KNIGHT = 5;
@@ -48,15 +49,30 @@ public:
 
 	std::string getPieceSprite(uint64_t piece) const;
 
+	static int getSquare(int x, int y);
+
 	void clearBoard();
 
 	// FEN
 
 	void loadFEN(std::string fen);
 
+	// Board manipulation
+
+	uint64_t getTurn() const;
+	void setTurn(int turn);
+
+	void move(int from, int to);
+
+	// Valid moves
+
+	std::vector<int> getValidPositions(int square);
+
+
 
 private:
 	int board[BOARD_SIZE * BOARD_SIZE];
+	int turn;
 };
 
 #endif

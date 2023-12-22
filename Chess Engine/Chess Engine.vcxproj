@@ -147,6 +147,7 @@
     <Image Include="resources\black_pawn.png" />
     <Image Include="resources\black_queen.png" />
     <Image Include="resources\black_rook.png" />
+    <Image Include="resources\valid_square.png" />
     <Image Include="resources\white_bishop.png" />
     <Image Include="resources\white_king.png" />
     <Image Include="resources\white_knight.png" />

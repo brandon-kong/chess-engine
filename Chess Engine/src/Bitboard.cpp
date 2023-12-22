@@ -10,6 +10,8 @@ Bitboard::Bitboard()
 	{
 		board[i] = 0;
 	}
+
+	turn = WHITE;
 }
 
 Bitboard::~Bitboard()
@@ -132,4 +134,111 @@ std::string Bitboard::getPieceSprite(uint64_t piece) const
 	pieceString = "resources\\" + pieceString;
 
 	return pieceString;
+}
+
+int Bitboard::getSquare(int x, int y)
+{
+	return y * BOARD_SIZE + x;
+}
+
+uint64_t Bitboard::getTurn() const
+{
+	return turn;
+}
+
+void Bitboard::setTurn(int turn)
+{
+	this->turn = turn;
+}
+
+void Bitboard::move(int from, int to)
+{
+	board[to] = board[from];
+	board[from] = EMPTY;
+
+	turn = turn == WHITE ? BLACK : WHITE;
+}
+
+std::vector<int> Bitboard::getValidPositions(int square)
+{
+	std::vector<int> validPositions;
+
+	int piece = getPieceType(square);
+	int color = getPieceColor(square);
+
+	std::cout << piece << std::endl;
+
+	if (piece == PAWN)
+	{
+		int direction = color == WHITE ? -1 : 1;
+
+		int forward = square + direction * BOARD_SIZE;
+
+		if (getPieceType(forward) == EMPTY)
+		{
+			validPositions.push_back(forward);
+
+			if (color == WHITE && square / BOARD_SIZE == 6 || color == BLACK && square / BOARD_SIZE == 1)
+			{
+				int forward2 = forward + direction * BOARD_SIZE;
+
+				if (getPieceType(forward2) == EMPTY)
+				{
+					validPositions.push_back(forward2);
+				}
+			}
+		}
+
+		int left = square + direction * BOARD_SIZE - 1;
+		int right = square + direction * BOARD_SIZE + 1;
+
+		if (getPieceType(left) != EMPTY && getPieceColor(left) != color)
+		{
+			validPositions.push_back(left);
+		}
+
+		if (getPieceType(right) != EMPTY && getPieceColor(right) != color)
+		{
+			validPositions.push_back(right);
+		}
+	}
+	else if (piece == KNIGHT)
+	{
+		int x = square % BOARD_SIZE;
+		int y = square / BOARD_SIZE;
+
+		int positions[8] = { getSquare(x - 1, y - 2), getSquare(x + 1, y - 2), getSquare(x - 2, y - 1), getSquare(x + 2, y - 1), getSquare(x - 2, y + 1), getSquare(x + 2, y + 1), getSquare(x - 1, y + 2), getSquare(x + 1, y + 2) };
+
+		for (int i = 0; i < 8; i++)
+		{
+			int position = positions[i];
+
+			if (position >= 0 && position < BOARD_SQUARES)
+			{
+				if (getPieceType(position) == EMPTY || getPieceColor(position) != color)
+				{
+					validPositions.push_back(position);
+				}
+			}
+		}
+	}
+	else if (piece == BISHOP)
+	{
+		int x = square % BOARD_SIZE;
+		int y = square / BOARD_SIZE;
+
+		int	position = getSquare(x - 1, y - 1);
+
+		while (position >= 0 && position < BOARD_SQUARES && getPieceType(position) == EMPTY)
+		{
+			validPositions.push_back(position);
+
+			x = position % BOARD_SIZE;
+			y = position / BOARD_SIZE;
+
+			position = getSquare(x - 1, y - 1);
+		}
+	}
+
+	return validPositions;
 }

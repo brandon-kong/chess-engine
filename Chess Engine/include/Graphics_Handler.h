@@ -16,6 +16,11 @@ static std::string WINDOW_TITLE = "Chess Engine";
 const static sf::Color LIGHT_SQUARE_COLOR = sf::Color(232, 237, 249);
 const static sf::Color DARK_SQUARE_COLOR = sf::Color(183, 192, 216);
 
+const static sf::Color SELECTED_LIGHT_SQUARE_COLOR = sf::Color(177, 167, 252);
+const static sf::Color SELECTED_DARK_SQUARE_COLOR = sf::Color(153, 144, 235);
+
+const static sf::Color VALID_MOVE_COLOR = sf::Color(153, 144, 235);
+
 class Graphics_Handler
 {
 public:
@@ -33,12 +38,18 @@ public:
 	// Display the window
 	void display();
 
+	void handleInput(sf::Event event, const Bitboard board);
+
 	// Draw the squares of the board
 	void drawSquares(const Bitboard& board);
 	void drawPieces(const Bitboard& board);
+	void drawValidPositions(Bitboard board, int square);
+
+	int getSelectedSquare() const;
 
 private:
 	sf::RenderWindow* window;
+	int selectedSquare;
 };
 
 #endif
